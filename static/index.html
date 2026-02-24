@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ferje – Arsvågen ↔ Mortavika</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0d1117;
+      --surface:   #161b22;
+      --border:    #30363d;
+      --text:      #e6edf3;
+      --muted:     #8b949e;
+      --accent:    #58a6ff;
+      --green:     #3fb950;
+      --yellow:    #d29922;
+      --next-bg:   #1c2a3a;
+      --next-border:#58a6ff;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+      min-height: 100vh;
+      padding: 24px 16px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    header h1 {
+      font-size: 1.4rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      color: var(--text);
+    }
+
+    header p {
+      color: var(--muted);
+      font-size: 0.8rem;
+      margin-top: 4px;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 600px) {
+      .board { grid-template-columns: 1fr; }
+    }
+
+    .column {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .column-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      background: #1c2128;
+    }
+
+    .column-header .route {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .column-header .route-sub {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .departure-list {
+      list-style: none;
+    }
+
+    .departure-item {
+      display: grid;
+      grid-template-columns: 48px 1fr auto;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 18px;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.15s;
+    }
+
+    .departure-item:last-child { border-bottom: none; }
+
+    .departure-item.next {
+      background: var(--next-bg);
+      border-left: 3px solid var(--next-border);
+      padding-left: 15px;
+    }
+
+    .departure-item:not(.next):hover {
+      background: rgba(255,255,255,0.03);
+    }
+
+    .dep-time {
+      font-size: 1.1rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      color: var(--text);
+      line-height: 1;
+    }
+
+    .departure-item.next .dep-time {
+      color: var(--accent);
+      font-size: 1.25rem;
+    }
+
+    .dep-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .dep-line {
+      font-size: 0.8rem;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .dep-badges {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 4px;
+      line-height: 1.4;
+    }
+
+    .badge.rt {
+      background: rgba(63,185,80,0.15);
+      color: var(--green);
+      border: 1px solid rgba(63,185,80,0.3);
+    }
+
+    .badge.rt::before {
+      content: '';
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+    }
+
+    .badge.aimed {
+      background: rgba(210,153,34,0.15);
+      color: var(--yellow);
+      border: 1px solid rgba(210,153,34,0.3);
+    }
+
+    .badge.next-label {
+      background: rgba(88,166,255,0.15);
+      color: var(--accent);
+      border: 1px solid rgba(88,166,255,0.3);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .dep-duration {
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .dep-duration span {
+      display: block;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .status-box {
+      padding: 32px 18px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    .status-box.error {
+      color: #f85149;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin-bottom: 8px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .refresh-bar {
+      height: 2px;
+      background: var(--border);
+      overflow: hidden;
+      border-radius: 0 0 10px 10px;
+    }
+
+    .refresh-progress {
+      height: 100%;
+      background: var(--accent);
+      width: 100%;
+      transform-origin: left;
+      animation: countdown 60s linear forwards;
+    }
+
+    @keyframes countdown {
+      from { transform: scaleX(1); }
+      to   { transform: scaleX(0); }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Ferjeruter – Arsvågen ↔ Mortavika</h1>
+  <p id="last-updated">Laster…</p>
+</header>
+
+<div class="board">
+  <div class="column" id="col-ars-mor">
+    <div class="column-header">
+      <div class="route">Arsvågen → Mortavika</div>
+      <div class="route-sub" id="sub-ars-mor"></div>
+    </div>
+    <ul class="departure-list" id="list-ars-mor">
+      <li class="status-box"><div class="spinner"></div><br>Henter avganger…</li>
+    </ul>
+    <div class="refresh-bar"><div class="refresh-progress" id="progress-ars-mor"></div></div>
+  </div>
+
+  <div class="column" id="col-mor-ars">
+    <div class="column-header">
+      <div class="route">Mortavika → Arsvågen</div>
+      <div class="route-sub" id="sub-mor-ars"></div>
+    </div>
+    <ul class="departure-list" id="list-mor-ars">
+      <li class="status-box"><div class="spinner"></div><br>Henter avganger…</li>
+    </ul>
+    <div class="refresh-bar"><div class="refresh-progress" id="progress-mor-ars"></div></div>
+  </div>
+</div>
+
+<script>
+  const ROUTES = [
+    { id: 'ars-mor', endpoint: '/api/departures/ars-mor' },
+    { id: 'mor-ars', endpoint: '/api/departures/mor-ars' },
+  ];
+
+  function formatTime(isoString) {
+    const d = new Date(isoString);
+    const hh = String(d.getHours()).padStart(2, '0');
+    const mm = String(d.getMinutes()).padStart(2, '0');
+    return `${hh}:${mm}`;
+  }
+
+  function formatDuration(seconds) {
+    return Math.round(seconds / 60);
+  }
+
+  function renderDepartures(routeId, data) {
+    const list = document.getElementById(`list-${routeId}`);
+    const sub  = document.getElementById(`sub-${routeId}`);
+
+    if (data.from_name && data.to_name) {
+      sub.textContent = `${data.from_name} → ${data.to_name}`;
+    }
+
+    if (!data.departures || data.departures.length === 0) {
+      list.innerHTML = '<li class="status-box">Ingen avganger funnet.</li>';
+      return;
+    }
+
+    list.innerHTML = data.departures.map((dep, i) => {
+      const isNext   = i === 0;
+      const expTime  = formatTime(dep.expectedDepartureTime);
+      const aimTime  = formatTime(dep.aimedDepartureTime);
+      const duration = formatDuration(dep.duration);
+      const delayed  = expTime !== aimTime;
+
+      const rtBadge = dep.realtime
+        ? `<span class="badge rt">Sanntid</span>`
+        : `<span class="badge aimed">Planlagt ${aimTime}</span>`;
+
+      const nextBadge = isNext ? `<span class="badge next-label">Neste</span>` : '';
+      const delayedBadge = delayed ? `<span class="badge aimed">Forsinket</span>` : '';
+
+      return `
+        <li class="departure-item ${isNext ? 'next' : ''}">
+          <div class="dep-time">${expTime}</div>
+          <div class="dep-meta">
+            <div class="dep-badges">${nextBadge}${rtBadge}${delayedBadge}</div>
+            <div class="dep-line">${dep.line}${dep.publicCode ? ' · ' + dep.publicCode : ''}</div>
+          </div>
+          <div class="dep-duration">
+            <span>${duration} min</span>
+            varighet
+          </div>
+        </li>`;
+    }).join('');
+  }
+
+  function renderError(routeId, message) {
+    const list = document.getElementById(`list-${routeId}`);
+    list.innerHTML = `<li class="status-box error">Kunne ikke hente avganger.<br><small>${message}</small></li>`;
+  }
+
+  function restartProgress(routeId) {
+    const el = document.getElementById(`progress-${routeId}`);
+    el.style.animation = 'none';
+    el.offsetHeight; // reflow
+    el.style.animation = 'countdown 60s linear forwards';
+  }
+
+  async function fetchRoute(routeId, endpoint) {
+    try {
+      const res = await fetch(endpoint);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      renderDepartures(routeId, data);
+    } catch (err) {
+      renderError(routeId, err.message);
+    }
+    restartProgress(routeId);
+  }
+
+  function updateTimestamp() {
+    const now = new Date();
+    const hh = String(now.getHours()).padStart(2, '0');
+    const mm = String(now.getMinutes()).padStart(2, '0');
+    const ss = String(now.getSeconds()).padStart(2, '0');
+    document.getElementById('last-updated').textContent =
+      `Sist oppdatert: ${hh}:${mm}:${ss}`;
+  }
+
+  function fetchAll() {
+    ROUTES.forEach(r => fetchRoute(r.id, r.endpoint));
+    updateTimestamp();
+  }
+
+  fetchAll();
+  setInterval(fetchAll, 60_000);
+</script>
+
+<footer style="text-align:center; margin-top:32px; font-size:0.75rem; color:var(--muted);">
+  Data made available by <a href="https://www.entur.no" target="_blank" rel="noopener" style="color:var(--accent); text-decoration:none;">Entur</a>
+</footer>
+
+</body>
+</html>

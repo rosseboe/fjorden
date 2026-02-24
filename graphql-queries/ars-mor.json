@@ -1,0 +1,65 @@
+{
+  trip(
+    from: {
+      place: "NSR:Quay:99704",
+      name: "Arsvågen kai, Bokn"
+    },
+    to: {
+      place: "NSR:Quay:99269",
+      name: "Mortavika ferjekai"
+    },
+    numTripPatterns: 10,
+    modes: {transportModes: {transportMode: water
+        }
+    },
+    searchWindow: 1440
+  ) {
+    tripPatterns {
+      startTime
+      duration
+      walkDistance
+      legs {
+        mode
+        distance
+        line {
+          id
+          publicCode
+          authority {
+            name
+                    }
+                }
+        fromEstimatedCall {
+          quay {
+            id
+            name
+                    }
+          realtime
+          aimedDepartureTime
+          expectedDepartureTime
+          actualDepartureTime
+                }
+        toEstimatedCall {
+          quay {
+            id
+            name
+                    }
+          aimedDepartureTime
+          expectedDepartureTime
+          actualDepartureTime
+                }
+        intermediateEstimatedCalls {
+          aimedArrivalTime
+          expectedArrivalTime
+          actualArrivalTime
+          aimedDepartureTime
+          expectedDepartureTime
+          actualDepartureTime
+          quay {
+            id
+            name
+                    }
+                }
+            }
+        }
+    }
+}

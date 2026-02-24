@@ -1,0 +1,83 @@
+info:
+  name: fjorden-next
+  type: graphql
+  seq: 4
+
+graphql:
+  method: POST
+  url: https://api.entur.io/journey-planner/v3/graphql
+  headers:
+    - name: ET-Client-Name
+      value: dev.fjorden.nu
+  body:
+    query: |-
+      {
+        trip(
+          from: {
+            place: "NSR:StopPlace:58463",
+            name: "Halhjem ferjekai, Os"
+          },
+          to: {
+            place: "NSR:StopPlace:58462",
+            name: "Sandvikvåg ferjekai, Fitjar"
+          },
+          numTripPatterns: 10,
+          modes:{transportModes: {transportMode: water}},
+          searchWindow: 1440
+        ) {
+          tripPatterns {
+            startTime
+            duration
+            walkDistance
+            legs {
+              mode
+              distance
+              line {
+                id
+                publicCode
+                authority {
+                  name
+                }
+              }
+              fromEstimatedCall {
+                quay {
+                  id
+                  name
+                }
+                realtime
+                aimedDepartureTime
+                expectedDepartureTime
+                actualDepartureTime
+              }
+              toEstimatedCall {
+                quay {
+                  id
+                  name
+                }
+                aimedDepartureTime
+                expectedDepartureTime
+                actualDepartureTime
+              }
+              intermediateEstimatedCalls {
+                aimedArrivalTime
+                expectedArrivalTime
+                actualArrivalTime
+                aimedDepartureTime
+                expectedDepartureTime
+                actualDepartureTime
+                quay {
+                  id
+                  name
+                }
+              }
+            }
+          }
+        }
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

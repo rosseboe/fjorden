@@ -1,0 +1,41 @@
+info:
+  name: tutorial
+  type: graphql
+  seq: 4
+
+graphql:
+  method: POST
+  url: https://api.entur.io/journey-planner/v3/graphql
+  headers:
+    - name: Content-Type
+      value: application/json
+    - name: ET-Client-Name
+      value: dev.fjorden.nu
+  body:
+    query: |
+      {
+        stopPlace(id: "NSR:StopPlace:59872") {
+          name
+          id
+          estimatedCalls(numberOfDepartures: 5, whiteListedModes: [rail]) {
+            expectedDepartureTime
+            aimedDepartureTime
+            destinationDisplay {
+              frontText
+            }
+            serviceJourney {
+              line {
+                publicCode
+                transportMode
+              }
+            }
+          }
+        }
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

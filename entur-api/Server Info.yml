@@ -1,0 +1,25 @@
+info:
+  name: Server Info
+  type: graphql
+  seq: 3
+
+graphql:
+  method: POST
+  url: https://api.entur.io/journey-planner/v3/graphql
+  headers:
+    - name: ET-Client-Name
+      value: fjorden-nu-webapp
+  body:
+    query: |-
+      {
+        serverInfo {
+          version
+        }
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
