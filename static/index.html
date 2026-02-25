@@ -4,55 +4,112 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ferje – Arsvågen ↔ Mortavika</title>
+  <link rel="stylesheet" href="https://unpkg.com/@entur/tokens/dist/styles.css" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+    /* ── Semantic tokens – light mode ── */
     :root {
-      --bg:        #0d1117;
-      --surface:   #161b22;
-      --border:    #30363d;
-      --text:      #e6edf3;
-      --muted:     #8b949e;
-      --accent:    #58a6ff;
-      --green:     #3fb950;
-      --yellow:    #d29922;
-      --next-bg:   #1c2a3a;
-      --next-border:#58a6ff;
+      --app-bg:              var(--colors-blue-90,  #f5f5f8);
+      --app-surface:         var(--colors-brand-white, #ffffff);
+      --app-surface-header:  var(--colors-blue-90,  #f5f5f8);
+      --app-border:          var(--colors-grey-70,  #e9e9e9);
+      --app-text:            var(--colors-grey-10,  #2a2a2a);
+      --app-muted:           var(--colors-grey-50,  #949494);
+      --app-heading:         var(--colors-brand-blue, #181c56);
+      --app-shadow:          rgba(24, 28, 86, 0.06);
+      --app-ferry:           var(--colors-transport-ferry-default, #0c6693);
+      --app-next-bg:         #e8f4f9;
+      --app-hover-bg:        var(--colors-blue-90,  #f5f5f8);
+
+      --app-badge-success-bg:    var(--colors-mint-tint,   #d0f1e3);
+      --app-badge-success-color: #0d6641;
+      --app-badge-success-dot:   var(--colors-mint-default, #1a8e60);
+      --app-badge-warning-bg:    var(--colors-canary-tint,  #fff4cd);
+      --app-badge-warning-color: #7a5000;
+      --app-badge-info-bg:       var(--colors-sky-tint,     #e1eff8);
+      --app-badge-info-color:    var(--colors-transport-ferry-default, #0c6693);
+      --app-badge-danger-bg:     var(--colors-lava-tint,    #ffcece);
+      --app-badge-danger-color:  var(--colors-lava-default, #d31b1b);
+    }
+
+    /* ── Semantic tokens – dark mode ── */
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --app-bg:              var(--colors-brand-blue, #181c56);
+        --app-surface:         var(--colors-blue-10,  #292b6a);
+        --app-surface-header:  rgba(0, 0, 0, 0.2);
+        --app-border:          var(--colors-blue-30,  #54568c);
+        --app-text:            var(--colors-brand-white, #ffffff);
+        --app-muted:           var(--colors-blue-60,  #babbcf);
+        --app-heading:         var(--colors-brand-white, #ffffff);
+        --app-shadow:          rgba(0, 0, 0, 0.3);
+        --app-ferry:           var(--colors-transport-ferry-contrast, #6fdfff);
+        --app-next-bg:         rgba(111, 223, 255, 0.08);
+        --app-hover-bg:        rgba(255, 255, 255, 0.04);
+
+        --app-badge-success-bg:    rgba(26, 142, 96, 0.2);
+        --app-badge-success-color: var(--colors-mint-contrast,   #5ac39a);
+        --app-badge-success-dot:   var(--colors-mint-contrast,   #5ac39a);
+        --app-badge-warning-bg:    rgba(255, 202, 40, 0.15);
+        --app-badge-warning-color: var(--colors-canary-contrast, #ffe082);
+        --app-badge-info-bg:       rgba(0, 130, 185, 0.2);
+        --app-badge-info-color:    var(--colors-transport-ferry-contrast, #6fdfff);
+        --app-badge-danger-bg:     rgba(211, 27, 27, 0.2);
+        --app-badge-danger-color:  var(--colors-lava-contrast,   #ff9494);
+      }
     }
 
     body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-      font-size: 14px;
+      background: var(--app-bg);
+      color: var(--app-text);
+      font-family: "Nationale", Arial, "Segoe UI", Roboto, Helvetica Neue, sans-serif;
+      font-size: 16px;
+      font-weight: 500;
       line-height: 1.5;
       min-height: 100vh;
-      padding: 24px 16px;
+      padding: 32px 16px;
     }
 
     header {
       text-align: center;
-      margin-bottom: 28px;
+      margin-bottom: 32px;
+    }
+
+    .header-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--app-ferry);
+      margin-bottom: 8px;
+    }
+
+    .header-eyebrow svg {
+      flex-shrink: 0;
     }
 
     header h1 {
-      font-size: 1.4rem;
+      font-size: 1.5rem;
       font-weight: 600;
-      letter-spacing: 0.02em;
-      color: var(--text);
+      color: var(--app-heading);
+      letter-spacing: -0.01em;
     }
 
     header p {
-      color: var(--muted);
-      font-size: 0.8rem;
-      margin-top: 4px;
+      color: var(--app-muted);
+      font-size: 0.875rem;
+      margin-top: 6px;
     }
 
     .board {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 20px;
-      max-width: 900px;
+      max-width: 860px;
       margin: 0 auto;
     }
 
@@ -61,27 +118,28 @@
     }
 
     .column {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 10px;
+      background: var(--app-surface);
+      border: 1px solid var(--app-border);
+      border-radius: var(--border-radiuses-large, 0.5rem);
       overflow: hidden;
+      box-shadow: 0 1px 3px var(--app-shadow);
     }
 
     .column-header {
-      padding: 14px 18px;
-      border-bottom: 1px solid var(--border);
-      background: #1c2128;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--app-border);
+      background: var(--app-surface-header);
     }
 
     .column-header .route {
       font-size: 1rem;
       font-weight: 600;
-      color: var(--text);
+      color: var(--app-heading);
     }
 
     .column-header .route-sub {
-      font-size: 0.75rem;
-      color: var(--muted);
+      font-size: 0.8125rem;
+      color: var(--app-muted);
       margin-top: 2px;
     }
 
@@ -91,48 +149,48 @@
 
     .departure-item {
       display: grid;
-      grid-template-columns: 48px 1fr auto;
+      grid-template-columns: 56px 1fr auto;
       align-items: center;
       gap: 12px;
-      padding: 12px 18px;
-      border-bottom: 1px solid var(--border);
-      transition: background 0.15s;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--app-border);
+      transition: background var(--timing-fast, 0.1s);
     }
 
     .departure-item:last-child { border-bottom: none; }
 
     .departure-item.next {
-      background: var(--next-bg);
-      border-left: 3px solid var(--next-border);
-      padding-left: 15px;
+      background: var(--app-next-bg);
+      border-left: 3px solid var(--app-ferry);
+      padding-left: 17px;
     }
 
     .departure-item:not(.next):hover {
-      background: rgba(255,255,255,0.03);
+      background: var(--app-hover-bg);
     }
 
     .dep-time {
-      font-size: 1.1rem;
-      font-weight: 700;
+      font-size: 1.125rem;
+      font-weight: 600;
       font-variant-numeric: tabular-nums;
-      color: var(--text);
+      color: var(--app-text);
       line-height: 1;
     }
 
     .departure-item.next .dep-time {
-      color: var(--accent);
-      font-size: 1.25rem;
+      color: var(--app-ferry);
+      font-size: 1.375rem;
     }
 
     .dep-meta {
       display: flex;
       flex-direction: column;
-      gap: 3px;
+      gap: 4px;
     }
 
     .dep-line {
-      font-size: 0.8rem;
-      color: var(--muted);
+      font-size: 0.8125rem;
+      color: var(--app-muted);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -145,49 +203,54 @@
       flex-wrap: wrap;
     }
 
-    .badge {
+    /* Entur badge style — eds-badge */
+    .eds-badge {
       display: inline-flex;
       align-items: center;
-      gap: 4px;
-      font-size: 0.7rem;
+      gap: 5px;
+      font-size: 0.6875rem;
       font-weight: 600;
-      padding: 2px 6px;
-      border-radius: 4px;
+      padding: 2px 8px;
+      border-radius: var(--border-radiuses-medium, 0.25rem);
       line-height: 1.4;
+      white-space: nowrap;
     }
 
-    .badge.rt {
-      background: rgba(63,185,80,0.15);
-      color: var(--green);
-      border: 1px solid rgba(63,185,80,0.3);
-    }
-
-    .badge.rt::before {
-      content: '';
-      display: inline-block;
+    .eds-badge .eds-badge__dot {
       width: 6px;
       height: 6px;
       border-radius: 50%;
-      background: var(--green);
+      flex-shrink: 0;
     }
 
-    .badge.aimed {
-      background: rgba(210,153,34,0.15);
-      color: var(--yellow);
-      border: 1px solid rgba(210,153,34,0.3);
+    .eds-badge--success {
+      background: var(--app-badge-success-bg);
+      color: var(--app-badge-success-color);
+    }
+    .eds-badge--success .eds-badge__dot {
+      background: var(--app-badge-success-dot);
     }
 
-    .badge.next-label {
-      background: rgba(88,166,255,0.15);
-      color: var(--accent);
-      border: 1px solid rgba(88,166,255,0.3);
+    .eds-badge--warning {
+      background: var(--app-badge-warning-bg);
+      color: var(--app-badge-warning-color);
+    }
+
+    .eds-badge--info {
+      background: var(--app-badge-info-bg);
+      color: var(--app-badge-info-color);
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.06em;
+    }
+
+    .eds-badge--danger {
+      background: var(--app-badge-danger-bg);
+      color: var(--app-badge-danger-color);
     }
 
     .dep-duration {
-      font-size: 0.8rem;
-      color: var(--muted);
+      font-size: 0.8125rem;
+      color: var(--app-muted);
       text-align: right;
       white-space: nowrap;
     }
@@ -196,29 +259,29 @@
       display: block;
       font-size: 1rem;
       font-weight: 600;
-      color: var(--text);
+      color: var(--app-text);
     }
 
     .status-box {
-      padding: 32px 18px;
+      padding: 36px 20px;
       text-align: center;
-      color: var(--muted);
-      font-size: 0.85rem;
+      color: var(--app-muted);
+      font-size: 0.875rem;
     }
 
     .status-box.error {
-      color: #f85149;
+      color: var(--app-badge-danger-color);
     }
 
     .spinner {
       display: inline-block;
-      width: 18px;
-      height: 18px;
-      border: 2px solid var(--border);
-      border-top-color: var(--accent);
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--app-border);
+      border-top-color: var(--app-ferry);
       border-radius: 50%;
       animation: spin 0.7s linear infinite;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
     }
 
     @keyframes spin {
@@ -226,15 +289,14 @@
     }
 
     .refresh-bar {
-      height: 2px;
-      background: var(--border);
+      height: 3px;
+      background: var(--app-border);
       overflow: hidden;
-      border-radius: 0 0 10px 10px;
     }
 
     .refresh-progress {
       height: 100%;
-      background: var(--accent);
+      background: var(--app-ferry);
       width: 100%;
       transform-origin: left;
       animation: countdown 60s linear forwards;
@@ -249,7 +311,14 @@
 <body>
 
 <header>
-  <h1>Ferjeruter – Arsvågen ↔ Mortavika</h1>
+  <div class="header-eyebrow">
+    <!-- Ferry icon from Entur icon set -->
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M20 18H4l-2 3h20l-2-3ZM4 18l2-7h12l2 7M8 11V7h8v4M10 7V4h4v3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    Ferjeruter
+  </div>
+  <h1>Arsvågen ↔ Mortavika</h1>
   <p id="last-updated">Laster…</p>
 </header>
 
@@ -315,11 +384,11 @@
       const delayed  = expTime !== aimTime;
 
       const rtBadge = dep.realtime
-        ? `<span class="badge rt">Sanntid</span>`
-        : `<span class="badge aimed">Planlagt ${aimTime}</span>`;
+        ? `<span class="eds-badge eds-badge--success"><span class="eds-badge__dot"></span>Sanntid</span>`
+        : `<span class="eds-badge eds-badge--warning">Planlagt ${aimTime}</span>`;
 
-      const nextBadge = isNext ? `<span class="badge next-label">Neste</span>` : '';
-      const delayedBadge = delayed ? `<span class="badge aimed">Forsinket</span>` : '';
+      const nextBadge = isNext ? `<span class="eds-badge eds-badge--info">Neste</span>` : '';
+      const delayedBadge = delayed ? `<span class="eds-badge eds-badge--danger">Forsinket</span>` : '';
 
       return `
         <li class="departure-item ${isNext ? 'next' : ''}">
@@ -378,9 +447,9 @@
   setInterval(fetchAll, 60_000);
 </script>
 
-<footer style="text-align:center; margin-top:32px; font-size:0.75rem; color:var(--muted);">
-  Data made available by <a href="https://www.entur.no" target="_blank" rel="noopener" style="color:var(--accent); text-decoration:none;">Entur</a>
-  · <a href="https://github.com/rosseboe/fjorden" target="_blank" rel="noopener" style="color:var(--accent); text-decoration:none;">GitHub</a>
+<footer style="text-align:center; margin-top:40px; font-size:0.8125rem; color:var(--app-muted);">
+  Data made available by <a href="https://www.entur.no" target="_blank" rel="noopener" style="color:var(--app-ferry); text-decoration:none; font-weight:600;">Entur</a>
+  · Code at <a href="https://github.com/rosseboe/fjorden" target="_blank" rel="noopener" style="color:var(--app-ferry); text-decoration:none; font-weight:600;">GitHub</a>
 </footer>
 
 </body>
