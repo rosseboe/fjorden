@@ -1,0 +1,30 @@
+info:
+  name: location
+  type: graphql
+  seq: 3
+
+graphql:
+  method: POST
+  url: https://api.entur.io/realtime/v2/vehicles/graphql
+  headers:
+    - name: ET-Client-Name
+      value: dev.fjorden.nu
+  body:
+    query: |
+      {
+        vehicles(codespaceId:"KOL", lineRef:"KOL:Line:30_1130") {
+          line {lineRef}
+          lastUpdated
+          location {
+            latitude
+            longitude
+          }
+        }
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

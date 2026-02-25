@@ -47,6 +47,9 @@
           expectedDepartureTime
           actualDepartureTime
                 }
+          serviceJourney {
+            id
+          }                
         intermediateEstimatedCalls {
           aimedArrivalTime
           expectedArrivalTime

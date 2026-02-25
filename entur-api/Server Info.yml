@@ -1,7 +1,7 @@
 info:
   name: Server Info
   type: graphql
-  seq: 3
+  seq: 2
 
 graphql:
   method: POST
