@@ -9,7 +9,20 @@
   <script>
     window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
   </script>
-  <script defer src="/_vercel/insights/script.js"></script>
+  <script>
+    (function () {
+      var script = document.createElement('script');
+      script.defer = true;
+      // Use external hosted script for localhost/dev to avoid 404s on /_vercel/insights/script.js
+      var host = window.location && window.location.hostname;
+      if (host === 'localhost' || host === '127.0.0.1') {
+        script.src = 'https://va.vercel-scripts.com/v1/script.debug.js';
+      } else {
+        script.src = '/_vercel/insights/script.js';
+      }
+      document.head.appendChild(script);
+    })();
+  </script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
