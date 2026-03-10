@@ -4,7 +4,7 @@ En static webapp som viser neste ferjetider i sambandet Mortavika-Arsvågen. Ins
 
 Bygget av Claude Code og bruker FastAPI som wrapper for entur GraphQL.
 
-Hostet på Railway: [https://fjorden-production.up.railway.app/](https://fjorden-production.up.railway.app/)
+Hostet på Vercel: [fjorden.vercel.app](fjorden.vercel.app)
 
 For å kjøre lokalt:
 
