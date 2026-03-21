@@ -11,7 +11,7 @@ WORKDIR /app
 COPY . .
 
 # Install dependencies using uv
-RUN uv sync --no-dev --frozen --system
+RUN uv sync --no-dev --frozen
 
 # Expose FastAPI port
 EXPOSE 8000
