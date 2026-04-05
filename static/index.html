@@ -552,6 +552,10 @@
   setInterval(fetchAll, 60_000);
   setInterval(updateCountdowns, 30_000);
 
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
+  }
+
   // Shared tooltip for situation icons
   const tooltip = document.createElement('div');
   tooltip.id = 'situation-tooltip';
