@@ -6,6 +6,12 @@
   <title>Ferje – Arsvågen ↔ Mortavika</title>
   <link rel="icon" href="/favicon.svg" media="(prefers-color-scheme: light)" />
   <link rel="icon" href="/favicon-dark.svg" media="(prefers-color-scheme: dark)" />
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#f5f5f8" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#181c56" media="(prefers-color-scheme: dark)" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Fjorden" />
   <link rel="stylesheet" href="https://unpkg.com/@entur/tokens/dist/styles.css" />
   <!-- Vercel Web Analytics -->
   <script>
@@ -268,6 +274,41 @@
       color: var(--app-badge-danger-color);
     }
 
+    .situation-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--app-badge-warning-bg);
+      color: var(--app-badge-warning-color);
+      cursor: pointer;
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    .situation-icon svg {
+      display: block;
+    }
+
+    #situation-tooltip {
+      display: none;
+      position: fixed;
+      background: var(--app-text);
+      color: var(--app-surface);
+      font-size: 0.75rem;
+      font-weight: 500;
+      padding: 8px 10px;
+      border-radius: var(--border-radiuses-medium, 0.25rem);
+      white-space: normal;
+      max-width: 240px;
+      z-index: 100;
+      line-height: 1.4;
+      box-shadow: 0 2px 8px var(--app-shadow);
+      pointer-events: none;
+    }
+
     .dep-duration {
       font-size: 0.8125rem;
       color: var(--app-muted);
@@ -275,11 +316,23 @@
       white-space: nowrap;
     }
 
-    .dep-duration span {
+    .dep-countdown {
       display: block;
-      font-size: 1rem;
+      font-size: 0.875rem;
       font-weight: 600;
       color: var(--app-text);
+    }
+
+    .departure-item.next .dep-countdown {
+      font-size: 1rem;
+      color: var(--app-ferry);
+    }
+
+    .dep-duration-mins {
+      display: block;
+      font-size: 0.75rem;
+      color: var(--app-muted);
+      margin-top: 1px;
     }
 
     .status-box {
@@ -383,6 +436,25 @@
     return Math.round(seconds / 60);
   }
 
+  function minutesUntil(isoString) {
+    return Math.round((new Date(isoString) - Date.now()) / 60000);
+  }
+
+  function formatCountdown(minutes) {
+    if (minutes <= 0) return 'Nå';
+    if (minutes < 60) return `om ${minutes} min`;
+    const h = Math.floor(minutes / 60);
+    const m = minutes % 60;
+    return m > 0 ? `om ${h}t ${m}min` : `om ${h}t`;
+  }
+
+  function updateCountdowns() {
+    document.querySelectorAll('[data-expected]').forEach(el => {
+      const span = el.querySelector('.dep-countdown');
+      if (span) span.textContent = formatCountdown(minutesUntil(el.dataset.expected));
+    });
+  }
+
   function renderDepartures(routeId, data) {
     const list = document.getElementById(`list-${routeId}`);
     const sub  = document.getElementById(`sub-${routeId}`);
@@ -397,11 +469,12 @@
     }
 
     list.innerHTML = data.departures.map((dep, i) => {
-      const isNext   = i === 0;
-      const expTime  = formatTime(dep.expectedDepartureTime);
-      const aimTime  = formatTime(dep.aimedDepartureTime);
-      const duration = formatDuration(dep.duration);
-      const delayed  = expTime !== aimTime;
+      const isNext        = i === 0;
+      const expTime       = formatTime(dep.expectedDepartureTime);
+      const aimTime       = formatTime(dep.aimedDepartureTime);
+      const duration      = formatDuration(dep.duration);
+      const delayed       = expTime !== aimTime;
+      const countdownText = formatCountdown(minutesUntil(dep.expectedDepartureTime));
 
       const rtBadge = dep.realtime
         ? `<span class="eds-badge eds-badge--success"><span class="eds-badge__dot"></span>Sanntid</span>`
@@ -410,16 +483,28 @@
       const nextBadge = isNext ? `<span class="eds-badge eds-badge--info">Neste</span>` : '';
       const delayedBadge = delayed ? `<span class="eds-badge eds-badge--danger">Forsinket</span>` : '';
 
+      const situationIcon = (dep.situations && dep.situations.length > 0) ? (() => {
+        const sit = dep.situations[0];
+        const tooltipText = [sit.summary, sit.description].filter(Boolean).join(' – ');
+        return `<span class="situation-icon" tabindex="0" data-situation="${tooltipText.replace(/"/g, '&quot;')}" aria-label="Driftsinformasjon: ${tooltipText.replace(/"/g, '&quot;')}">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/>
+            <rect x="7.25" y="7" width="1.5" height="5" rx="0.75" fill="currentColor"/>
+            <circle cx="8" cy="4.5" r="0.85" fill="currentColor"/>
+          </svg>
+        </span>`;
+      })() : '';
+
       return `
         <li class="departure-item ${isNext ? 'next' : ''}">
           <div class="dep-time">${expTime}</div>
           <div class="dep-meta">
-            <div class="dep-badges">${nextBadge}${rtBadge}${delayedBadge}</div>
+            <div class="dep-badges">${nextBadge}${rtBadge}${delayedBadge}${situationIcon}</div>
             <div class="dep-line">${dep.line}${dep.publicCode ? ' · ' + dep.publicCode : ''}</div>
           </div>
-          <div class="dep-duration">
-            <span>${duration} min</span>
-            varighet
+          <div class="dep-duration" data-expected="${dep.expectedDepartureTime}">
+            <span class="dep-countdown">${countdownText}</span>
+            <span class="dep-duration-mins">${duration} min</span>
           </div>
         </li>`;
     }).join('');
@@ -465,6 +550,70 @@
 
   fetchAll();
   setInterval(fetchAll, 60_000);
+  setInterval(updateCountdowns, 30_000);
+
+  // Shared tooltip for situation icons
+  const tooltip = document.createElement('div');
+  tooltip.id = 'situation-tooltip';
+  document.body.appendChild(tooltip);
+
+  document.body.addEventListener('mouseover', e => {
+    const icon = e.target.closest('.situation-icon');
+    if (!icon) return;
+    tooltip.textContent = icon.dataset.situation;
+    tooltip.style.display = 'block';
+    const r = icon.getBoundingClientRect();
+    const tw = tooltip.offsetWidth;
+    let left = r.left + r.width / 2 - tw / 2;
+    left = Math.max(8, Math.min(left, window.innerWidth - tw - 8));
+    tooltip.style.left = left + 'px';
+    tooltip.style.top = (r.top - tooltip.offsetHeight - 6) + 'px';
+  });
+
+  document.body.addEventListener('mouseout', e => {
+    if (e.target.closest('.situation-icon')) tooltip.style.display = 'none';
+  });
+
+  document.body.addEventListener('focusin', e => {
+    const icon = e.target.closest('.situation-icon');
+    if (!icon) return;
+    tooltip.textContent = icon.dataset.situation;
+    tooltip.style.display = 'block';
+    const r = icon.getBoundingClientRect();
+    const tw = tooltip.offsetWidth;
+    let left = r.left + r.width / 2 - tw / 2;
+    left = Math.max(8, Math.min(left, window.innerWidth - tw - 8));
+    tooltip.style.left = left + 'px';
+    tooltip.style.top = (r.top - tooltip.offsetHeight - 6) + 'px';
+  });
+
+  document.body.addEventListener('focusout', e => {
+    if (e.target.closest('.situation-icon')) tooltip.style.display = 'none';
+  });
+
+  document.body.addEventListener('touchstart', e => {
+    const icon = e.target.closest('.situation-icon');
+    if (icon) {
+      e.preventDefault();
+      if (tooltip.style.display === 'block' && tooltip._anchor === icon) {
+        tooltip.style.display = 'none';
+        tooltip._anchor = null;
+        return;
+      }
+      tooltip.textContent = icon.dataset.situation;
+      tooltip.style.display = 'block';
+      tooltip._anchor = icon;
+      const r = icon.getBoundingClientRect();
+      const tw = tooltip.offsetWidth;
+      let left = r.left + r.width / 2 - tw / 2;
+      left = Math.max(8, Math.min(left, window.innerWidth - tw - 8));
+      tooltip.style.left = left + 'px';
+      tooltip.style.top = (r.top - tooltip.offsetHeight - 6) + 'px';
+    } else if (tooltip.style.display === 'block') {
+      tooltip.style.display = 'none';
+      tooltip._anchor = null;
+    }
+  }, { passive: false });
 </script>
 
 <footer style="text-align:center; margin-top:40px; font-size:0.8125rem; color:var(--app-muted);">

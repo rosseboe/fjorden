@@ -1,0 +1,17 @@
+{
+  "name": "Fjorden – Arsvågen ↔ Mortavika",
+  "short_name": "Fjorden",
+  "description": "Ferjerutetider for Arsvågen–Mortavika",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f5f5f8",
+  "theme_color": "#181c56",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

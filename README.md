@@ -9,7 +9,7 @@ Hostet på Vercel: [fjorden.vercel.app](fjorden.vercel.app)
 For å kjøre lokalt:
 
 ```bash
-uv sunc
+uv sync
 uv run uvicorn main:app --reload
 ```
 

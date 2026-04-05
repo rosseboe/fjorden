@@ -14,7 +14,7 @@ app.add_middleware(
 
 ENTUR_URL = "https://api.entur.io/journey-planner/v3/graphql"
 ENTUR_HEADERS = {
-    "ET-Client-Name": "dev.fjorden.nu",
+    "ET-Client-Name": "fjorden.rosseboe.eu",
     "Content-Type": "application/json",
 }
 
@@ -29,7 +29,7 @@ ROUTES = {
             modes: { transportModes: { transportMode: water } },
             searchWindow: 1440
         ) { tripPatterns { startTime duration legs {
-            line { publicCode authority { name } }
+            line { publicCode authority { name } situations { summary { language value } description { language value } } }
             fromEstimatedCall { realtime aimedDepartureTime expectedDepartureTime }
             toEstimatedCall { aimedDepartureTime expectedDepartureTime }
         } } } }""",
@@ -44,7 +44,7 @@ ROUTES = {
             modes: { transportModes: { transportMode: water } },
             searchWindow: 1440
         ) { tripPatterns { startTime duration legs {
-            line { publicCode authority { name } }
+            line { publicCode authority { name } situations { summary { language value } description { language value } } }
             fromEstimatedCall { realtime aimedDepartureTime expectedDepartureTime }
             toEstimatedCall { aimedDepartureTime expectedDepartureTime }
         } } } }""",
@@ -74,6 +74,19 @@ async def fetch_departures(route_key: str) -> dict:
         leg = legs[0]
         from_call = leg.get("fromEstimatedCall") or {}
         line = leg.get("line") or {}
+        raw_situations = line.get("situations") or []
+        situations = []
+        for sit in raw_situations:
+            summary = next(
+                (s["value"] for s in (sit.get("summary") or []) if s.get("language") == "no"),
+                next((s["value"] for s in (sit.get("summary") or [])), None),
+            )
+            description = next(
+                (s["value"] for s in (sit.get("description") or []) if s.get("language") == "no"),
+                next((s["value"] for s in (sit.get("description") or [])), None),
+            )
+            if summary or description:
+                situations.append({"summary": summary, "description": description})
         departures.append(
             {
                 "startTime": pattern.get("startTime"),
@@ -83,6 +96,7 @@ async def fetch_departures(route_key: str) -> dict:
                 "realtime": from_call.get("realtime", False),
                 "publicCode": line.get("publicCode", ""),
                 "line": (line.get("authority") or {}).get("name", ""),
+                "situations": situations,
             }
         )
 
