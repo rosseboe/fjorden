@@ -1,6 +1,6 @@
 # Fjorden 
 
-En static webapp som viser neste ferjetider i sambandet Mortavika-Arsvågen. Inspirert av [nesteferje.no][nextFerryUrl]
+En webapp som viser neste ferjetider i sambandet Mortavika-Arsvågen. Inspirert av [nesteferje.no][nextFerryUrl]
 
 Bygget av Claude Code og bruker FastAPI som wrapper for entur GraphQL.
 
